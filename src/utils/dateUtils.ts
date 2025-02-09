@@ -16,7 +16,7 @@ export function getWeekDates(date: Date): Date[] {
   const sunday = new Date(date.setDate(diff));
   const weekDates = [];
   for (let i = 0; i < 7; i++) {
-    const nextDate = new Date(sunday);
+    const nextDate = new Date(sunday.setHours(0, 0, 0, 0));
     nextDate.setDate(sunday.getDate() + i);
     weekDates.push(nextDate);
   }
@@ -84,17 +84,11 @@ export function formatMonth(date: Date): string {
   return `${year}년 ${month}월`;
 }
 
-const stripTime = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
 /**
  * 주어진 날짜가 특정 범위 내에 있는지 확인합니다.
  */
 export function isDateInRange(date: Date, rangeStart: Date, rangeEnd: Date): boolean {
-  const normalizedDate = stripTime(date);
-  const normalizedStart = stripTime(rangeStart);
-  const normalizedEnd = stripTime(rangeEnd);
-
-  return normalizedDate >= normalizedStart && normalizedDate <= normalizedEnd;
+  return date >= rangeStart && date <= rangeEnd;
 }
 
 export function fillZero(value: number, size = 2) {

@@ -3,104 +3,119 @@ import { ChangeEvent, useState } from 'react';
 import { Event, RepeatType } from '../types';
 import { getTimeErrorMessage } from '../utils/timeValidation';
 
-type TimeErrorRecord = Record<'startTimeError' | 'endTimeError', string | null>;
+interface FormState {
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  location: string;
+  category: string;
+  isRepeating: boolean;
+  repeatType: RepeatType;
+  repeatInterval: number;
+  repeatEndDate: string;
+  notificationTime: number;
+  startTimeError: string | null;
+  endTimeError: string | null;
+  editingEvent: Event | null;
+}
 
 export const useEventForm = (initialEvent?: Event) => {
-  const [title, setTitle] = useState(initialEvent?.title || '');
-  const [date, setDate] = useState(initialEvent?.date || '');
-  const [startTime, setStartTime] = useState(initialEvent?.startTime || '');
-  const [endTime, setEndTime] = useState(initialEvent?.endTime || '');
-  const [description, setDescription] = useState(initialEvent?.description || '');
-  const [location, setLocation] = useState(initialEvent?.location || '');
-  const [category, setCategory] = useState(initialEvent?.category || '');
-  const [isRepeating, setIsRepeating] = useState(initialEvent?.repeat.type !== 'none');
-  const [repeatType, setRepeatType] = useState<RepeatType>(initialEvent?.repeat.type || 'none');
-  const [repeatInterval, setRepeatInterval] = useState(initialEvent?.repeat.interval || 1);
-  const [repeatEndDate, setRepeatEndDate] = useState(initialEvent?.repeat.endDate || '');
-  const [notificationTime, setNotificationTime] = useState(initialEvent?.notificationTime || 10);
-
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-
-  const [{ startTimeError, endTimeError }, setTimeError] = useState<TimeErrorRecord>({
+  const [formState, setFormState] = useState<FormState>({
+    title: initialEvent?.title || '',
+    date: initialEvent?.date || '',
+    startTime: initialEvent?.startTime || '',
+    endTime: initialEvent?.endTime || '',
+    description: initialEvent?.description || '',
+    location: initialEvent?.location || '',
+    category: initialEvent?.category || '',
+    isRepeating: initialEvent?.repeat.type !== 'none',
+    repeatType: initialEvent?.repeat.type || 'none',
+    repeatInterval: initialEvent?.repeat.interval || 1,
+    repeatEndDate: initialEvent?.repeat.endDate || '',
+    notificationTime: initialEvent?.notificationTime || 10,
     startTimeError: null,
     endTimeError: null,
+    editingEvent: null,
   });
+
+  const updateFormState = (updates: Partial<FormState>) => {
+    setFormState((current) => ({ ...current, ...updates }));
+  };
 
   const handleStartTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newStartTime = e.target.value;
-    setStartTime(newStartTime);
-    setTimeError(getTimeErrorMessage(newStartTime, endTime));
+    const timeErrors = getTimeErrorMessage(newStartTime, formState.endTime);
+    updateFormState({
+      startTime: newStartTime,
+      startTimeError: timeErrors.startTimeError,
+      endTimeError: timeErrors.endTimeError,
+    });
   };
 
   const handleEndTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newEndTime = e.target.value;
-    setEndTime(newEndTime);
-    setTimeError(getTimeErrorMessage(startTime, newEndTime));
+    const timeErrors = getTimeErrorMessage(formState.startTime, newEndTime);
+    updateFormState({
+      endTime: newEndTime,
+      startTimeError: timeErrors.startTimeError,
+      endTimeError: timeErrors.endTimeError,
+    });
   };
 
   const resetForm = () => {
-    setTitle('');
-    setDate('');
-    setStartTime('');
-    setEndTime('');
-    setDescription('');
-    setLocation('');
-    setCategory('');
-    setIsRepeating(false);
-    setRepeatType('none');
-    setRepeatInterval(1);
-    setRepeatEndDate('');
-    setNotificationTime(10);
+    setFormState({
+      title: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      description: '',
+      location: '',
+      category: '',
+      isRepeating: false,
+      repeatType: 'none',
+      repeatInterval: 1,
+      repeatEndDate: '',
+      notificationTime: 10,
+      startTimeError: null,
+      endTimeError: null,
+      editingEvent: null,
+    });
   };
 
-  const editEvent = (event: Event) => {
-    setEditingEvent(event);
-    setTitle(event.title);
-    setDate(event.date);
-    setStartTime(event.startTime);
-    setEndTime(event.endTime);
-    setDescription(event.description);
-    setLocation(event.location);
-    setCategory(event.category);
-    setIsRepeating(event.repeat.type !== 'none');
-    setRepeatType(event.repeat.type);
-    setRepeatInterval(event.repeat.interval);
-    setRepeatEndDate(event.repeat.endDate || '');
-    setNotificationTime(event.notificationTime);
+  const editEvent = (event: Event | null) => {
+    if (!event) {
+      resetForm();
+      return;
+    }
+    setFormState({
+      title: event.title,
+      date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      description: event.description,
+      location: event.location,
+      category: event.category,
+      isRepeating: event.repeat.type !== 'none',
+      repeatType: event.repeat.type,
+      repeatInterval: event.repeat.interval,
+      repeatEndDate: event.repeat.endDate || '',
+      notificationTime: event.notificationTime,
+      startTimeError: null,
+      endTimeError: null,
+      editingEvent: event,
+    });
   };
 
   return {
-    title,
-    setTitle,
-    date,
-    setDate,
-    startTime,
-    setStartTime,
-    endTime,
-    setEndTime,
-    description,
-    setDescription,
-    location,
-    setLocation,
-    category,
-    setCategory,
-    isRepeating,
-    setIsRepeating,
-    repeatType,
-    setRepeatType,
-    repeatInterval,
-    setRepeatInterval,
-    repeatEndDate,
-    setRepeatEndDate,
-    notificationTime,
-    setNotificationTime,
-    startTimeError,
-    endTimeError,
-    editingEvent,
-    setEditingEvent,
-    handleStartTimeChange,
-    handleEndTimeChange,
-    resetForm,
-    editEvent,
+    formState,
+    formHandlers: {
+      updateFormState,
+      handleStartTimeChange,
+      handleEndTimeChange,
+      resetForm,
+      editEvent,
+    },
   };
 };
