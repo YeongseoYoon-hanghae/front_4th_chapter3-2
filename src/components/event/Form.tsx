@@ -11,8 +11,9 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 
+import RepeatSetting from './RepeatSetting';
 import { CATEGORIES, NOTIFICATION_OPTIONS } from '../../policy';
-import { FormState, RepeatType, FormHandlers } from '../../types';
+import { FormState, FormHandlers } from '../../types';
 
 interface EventFormProps {
   formState: FormState;
@@ -30,9 +31,6 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
     location,
     category,
     isRepeating,
-    repeatType,
-    repeatInterval,
-    repeatEndDate,
     notificationTime,
     startTimeError,
     endTimeError,
@@ -134,39 +132,12 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
       </FormControl>
 
       {isRepeating && (
-        <VStack width="100%">
-          <FormControl>
-            <FormLabel>반복 유형</FormLabel>
-            <Select
-              value={repeatType}
-              onChange={(e) => updateFormState({ repeatType: e.target.value as RepeatType })}
-            >
-              <option value="daily">매일</option>
-              <option value="weekly">매주</option>
-              <option value="monthly">매월</option>
-              <option value="yearly">매년</option>
-            </Select>
-          </FormControl>
-          <HStack width="100%">
-            <FormControl>
-              <FormLabel>반복 간격</FormLabel>
-              <Input
-                type="number"
-                value={repeatInterval}
-                onChange={(e) => updateFormState({ repeatInterval: Number(e.target.value) })}
-                min={1}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>반복 종료일</FormLabel>
-              <Input
-                type="date"
-                value={repeatEndDate}
-                onChange={(e) => updateFormState({ repeatEndDate: e.target.value })}
-              />
-            </FormControl>
-          </HStack>
-        </VStack>
+        <RepeatSetting
+          repeatType={formState.repeatType}
+          repeatInterval={formState.repeatInterval}
+          repeatEndDate={formState.repeatEndDate}
+          updateFormState={updateFormState}
+        />
       )}
 
       <Button data-testid="event-submit-button" onClick={onSubmit} colorScheme="blue">
