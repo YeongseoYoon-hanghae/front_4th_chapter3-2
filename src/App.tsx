@@ -11,7 +11,7 @@ import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
 import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
-import { Event, EventFormData } from './types';
+import { Event, EventFormType } from './types';
 import { findOverlappingEvents } from './utils/eventOverlap';
 
 function App() {
@@ -51,7 +51,7 @@ function App() {
       return;
     }
 
-    const eventData: Event | EventFormData = {
+    const eventData: Event | EventFormType = {
       id: formState.editingEvent ? formState.editingEvent.id : undefined,
       title: formState.title,
       date: formState.date,

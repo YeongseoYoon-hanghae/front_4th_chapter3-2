@@ -1,7 +1,7 @@
 import { useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
-import { Event, EventFormData } from '../types';
+import { Event, EventFormType } from '../types';
 
 export const useEventOperations = (editing: boolean, onSave?: () => void) => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -26,7 +26,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     }
   };
 
-  const saveEvent = async (eventData: Event | EventFormData) => {
+  const saveEvent = async (eventData: Event | EventFormType) => {
     try {
       let response;
       if (editing) {
