@@ -102,3 +102,16 @@ export function formatDate(currentDate: Date, day?: number) {
     fillZero(day ?? currentDate.getDate()),
   ].join('-');
 }
+
+export const isLastDayOfMonth = (date: Date): boolean => {
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  return date.getDate() === lastDay;
+};
+
+export const isLastWeekOfMonth = (date: Date): boolean => {
+  const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const lastWeekStart = new Date(lastDayOfMonth);
+  lastWeekStart.setDate(lastDayOfMonth.getDate() - lastDayOfMonth.getDay());
+
+  return date >= lastWeekStart;
+};

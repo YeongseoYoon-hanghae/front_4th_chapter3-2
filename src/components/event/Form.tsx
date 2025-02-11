@@ -138,6 +138,7 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
           repeatInterval={formState.repeatInterval}
           repeatEndDate={formState.repeatEndDate}
           updateFormState={updateFormState}
+          selectedDate={date}
         />
       )}
 
