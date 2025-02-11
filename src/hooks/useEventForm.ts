@@ -30,7 +30,7 @@ export const useEventForm = (initialEvent?: Event) => {
     description: initialEvent?.description || '',
     location: initialEvent?.location || '',
     category: initialEvent?.category || '',
-    isRepeating: initialEvent?.repeat.type !== 'none',
+    isRepeating: initialEvent ? initialEvent.repeat.type !== 'none' : false,
     repeatType: initialEvent?.repeat.type || 'none',
     repeatInterval: initialEvent?.repeat.interval || 1,
     repeatEndDate: initialEvent?.repeat.endDate || '',
