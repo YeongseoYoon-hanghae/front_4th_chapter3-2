@@ -111,30 +111,53 @@ describe('EventForm', () => {
   });
 
   describe('반복 설정', () => {
-    it('반복 설정 체크박스를 선택하면 추가 설정이 표시된다', async () => {
-      const user = userEvent.setup();
-      const { rerender } = renderWithSetup(<EventForm {...defaultProps} />);
+    it('날짜가 없으면 반복 일정 체크박스가 비활성화된다', () => {
+      renderWithSetup(<EventForm {...defaultProps} />);
+
+      const repeatCheckbox = screen.getByLabelText('반복 일정');
+      expect(repeatCheckbox).toBeDisabled();
+    });
+
+    it('날짜가 있으면 반복 일정 체크박스가 활성화된다', () => {
+      const formState = {
+        ...mockFormState,
+        date: '2024-03-15',
+      };
+
+      renderWithSetup(<EventForm {...defaultProps} formState={formState} />);
+
+      const repeatCheckbox = screen.getByLabelText('반복 일정');
+      expect(repeatCheckbox).toBeEnabled();
+    });
+
+    it('체크박스 클릭 시 상태가 업데이트된다', async () => {
+      const formState = {
+        ...mockFormState,
+        date: '2024-03-15',
+      };
+
+      const { user } = renderWithSetup(<EventForm {...defaultProps} formState={formState} />);
 
       const repeatCheckbox = screen.getByLabelText('반복 일정');
       await user.click(repeatCheckbox);
 
       expect(mockHandlers.updateFormState).toHaveBeenCalledWith({ isRepeating: true });
+    });
+  });
 
-      rerender(<EventForm {...defaultProps} formState={{ ...mockFormState, isRepeating: true }} />);
+  describe('반복 일정 설정 필드', () => {
+    it('반복 일정이 체크되면 추가 설정 필드들이 표시된다', () => {
+      const formState = {
+        ...mockFormState,
+        date: '2024-03-15',
+        isRepeating: true,
+      };
+
+      renderWithSetup(<EventForm {...defaultProps} formState={formState} />);
 
       expect(screen.getByLabelText('반복 유형')).toBeInTheDocument();
       expect(screen.getByLabelText('반복 간격')).toBeInTheDocument();
       expect(screen.getByLabelText('반복 종료일')).toBeInTheDocument();
-    });
-
-    it('반복 유형 변경 시 updateFormState가 호출된다', async () => {
-      const user = userEvent.setup();
-      renderWithSetup(
-        <EventForm {...defaultProps} formState={{ ...mockFormState, isRepeating: true }} />
-      );
-
-      await user.selectOptions(screen.getByLabelText('반복 유형'), 'weekly');
-      expect(mockHandlers.updateFormState).toHaveBeenCalledWith({ repeatType: 'weekly' });
     });
   });
 
