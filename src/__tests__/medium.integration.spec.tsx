@@ -445,3 +445,76 @@ describe('일정 알림 테스트', () => {
     });
   });
 });
+
+describe('반복 일정 생성', () => {
+  const sampleEvent = {
+    id: '1',
+    title: '테스트 회의',
+    date: '2024-10-17',
+    startTime: '09:00',
+    endTime: '10:00',
+    description: '',
+    location: '',
+    category: '업무',
+    repeat: {
+      type: 'none' as RepeatType,
+      interval: 1,
+      endDate: undefined,
+    },
+    notificationTime: 10,
+  };
+
+  describe('반복 유형 선택', () => {
+    it('날짜를 선택하지 않은 경우엔 반복 일정 체크박스가 disable 되며 반복 유형을 선택할 수 없다.', async () => {
+      renderWithSetup(<App />);
+
+      const repeatCheckbox = screen.getByLabelText('반복 일정');
+      expect(repeatCheckbox).toBeDisabled();
+
+      await waitFor(() => {
+        expect(screen.queryByText('반복 유형')).not.toBeInTheDocument();
+      });
+    });
+
+    it('날짜를 선택한 경우엔 반복 유형을 선택할 수 있다.', async () => {
+      const { user } = renderWithSetup(<App />);
+
+      const dateInput = screen.getByLabelText('날짜');
+      await user.type(dateInput, '2024-03-15');
+
+      const repeatCheckbox = screen.getByLabelText('반복 일정');
+      await user.click(repeatCheckbox);
+
+      const repeatTypeSelect = await screen.findByLabelText('반복 유형');
+      expect(repeatTypeSelect).toBeInTheDocument();
+
+      const options = screen.getAllByRole('option');
+      const repeatTypes = options.map((option) => option.textContent);
+      expect(repeatTypes).toContain('매일');
+      expect(repeatTypes).toContain('매주');
+      expect(repeatTypes).toContain('매월');
+      expect(repeatTypes).toContain('매년');
+    });
+
+    it('일정 수정 시에도 반복 유형을 변경할 수 있어야 한다.', async () => {
+      setupMockHandlerUpdating([sampleEvent]);
+      const { user } = renderWithSetup(<App />);
+
+      const editButtons = await screen.findAllByLabelText('Edit event');
+      await user.click(editButtons[0]);
+
+      const repeatCheckbox = screen.getByRole('checkbox', { name: /반복 일정/i });
+      await user.click(repeatCheckbox);
+
+      const repeatTypeSelect = screen.getByLabelText('반복 유형');
+      await user.selectOptions(repeatTypeSelect, 'weekly');
+
+      await user.click(screen.getByTestId('event-submit-button'));
+
+      const events = await screen.findAllByText('테스트 회의');
+      expect(events.length).toBeGreaterThan(1);
+    });
+
+  });
+
+});
