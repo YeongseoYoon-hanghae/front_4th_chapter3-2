@@ -10,6 +10,7 @@ import {
   getWeeksAtMonth,
   isDateInRange,
   isLastDayOfMonth,
+  isLastWeekOfMonth,
 } from '../../utils/dateUtils';
 
 describe('getDaysInMonth', () => {
@@ -405,5 +406,47 @@ describe('isLastDayOfMonth', () => {
     expect(isLastDayOfMonth(new Date(2024, 3, 29))).toBe(false);
     expect(isLastDayOfMonth(new Date(2024, 1, 28))).toBe(false);
     expect(isLastDayOfMonth(new Date(2023, 1, 27))).toBe(false);
+  });
+});
+
+describe('isLastWeekOfMonth', () => {
+  it('31일이 있는 달의 마지막 주의 날짜들은 true를 반환한다', () => {
+    expect(isLastWeekOfMonth(new Date(2024, 0, 28))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 0, 29))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 0, 30))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 0, 31))).toBe(true);
+
+    expect(isLastWeekOfMonth(new Date(2024, 0, 27))).toBe(false);
+  });
+
+  it('30일이 있는 달의 마지막 주의 날짜들은 true를 반환한다', () => {
+    expect(isLastWeekOfMonth(new Date(2024, 3, 28))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 3, 29))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 3, 30))).toBe(true);
+
+    expect(isLastWeekOfMonth(new Date(2024, 3, 27))).toBe(false);
+  });
+
+  it('2월의 마지막 주의 날짜들은 true를 반환한다', () => {
+    expect(isLastWeekOfMonth(new Date(2024, 1, 25))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 1, 26))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 1, 27))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 1, 28))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2024, 1, 29))).toBe(true);
+
+    expect(isLastWeekOfMonth(new Date(2023, 1, 26))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2023, 1, 27))).toBe(true);
+    expect(isLastWeekOfMonth(new Date(2023, 1, 28))).toBe(true);
+
+    expect(isLastWeekOfMonth(new Date(2024, 1, 24))).toBe(false);
+    expect(isLastWeekOfMonth(new Date(2023, 1, 25))).toBe(false);
+  });
+
+  it('달의 첫 주와 중간 주의 날짜들은 false를 반환한다', () => {
+    expect(isLastWeekOfMonth(new Date(2024, 0, 1))).toBe(false);
+    expect(isLastWeekOfMonth(new Date(2024, 0, 7))).toBe(false);
+
+    expect(isLastWeekOfMonth(new Date(2024, 0, 15))).toBe(false);
+    expect(isLastWeekOfMonth(new Date(2024, 0, 21))).toBe(false);
   });
 });
