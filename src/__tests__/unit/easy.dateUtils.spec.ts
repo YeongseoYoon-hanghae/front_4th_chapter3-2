@@ -9,6 +9,7 @@ import {
   getWeekDates,
   getWeeksAtMonth,
   isDateInRange,
+  isLastDayOfMonth,
 } from '../../utils/dateUtils';
 
 describe('getDaysInMonth', () => {
@@ -378,5 +379,31 @@ describe('formatDate', () => {
     const result = formatDate(date, 15);
 
     expect(result).toBe('2024-07-15');
+  });
+});
+
+describe('isLastDayOfMonth', () => {
+  it('31일이 마지막인 달의 경우 31일이면 true를 반환한다', () => {
+    expect(isLastDayOfMonth(new Date(2024, 0, 31))).toBe(true);
+    expect(isLastDayOfMonth(new Date(2024, 2, 31))).toBe(true);
+    expect(isLastDayOfMonth(new Date(2024, 6, 31))).toBe(true);
+  });
+
+  it('30일이 마지막인 달의 경우 30일이면 true를 반환한다', () => {
+    expect(isLastDayOfMonth(new Date(2024, 3, 30))).toBe(true);
+    expect(isLastDayOfMonth(new Date(2024, 5, 30))).toBe(true);
+    expect(isLastDayOfMonth(new Date(2024, 8, 30))).toBe(true);
+  });
+
+  it('2월의 경우 윤년이면 29일, 평년이면 28일에 true를 반환한다', () => {
+    expect(isLastDayOfMonth(new Date(2024, 1, 29))).toBe(true);
+    expect(isLastDayOfMonth(new Date(2023, 1, 28))).toBe(true);
+  });
+
+  it('마지막 날이 아닌 경우 false를 반환한다', () => {
+    expect(isLastDayOfMonth(new Date(2024, 0, 30))).toBe(false);
+    expect(isLastDayOfMonth(new Date(2024, 3, 29))).toBe(false);
+    expect(isLastDayOfMonth(new Date(2024, 1, 28))).toBe(false);
+    expect(isLastDayOfMonth(new Date(2023, 1, 27))).toBe(false);
   });
 });
