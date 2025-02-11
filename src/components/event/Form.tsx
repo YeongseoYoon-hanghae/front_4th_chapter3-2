@@ -112,6 +112,7 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
         <Checkbox
           isChecked={isRepeating}
           onChange={(e) => updateFormState({ isRepeating: e.target.checked })}
+          disabled={!date}
         >
           반복 일정
         </Checkbox>
