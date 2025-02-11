@@ -10,6 +10,7 @@ describe('RepeatSetting', () => {
     repeatInterval: 1,
     repeatEndDate: '2024-02-09',
     updateFormState: vi.fn(),
+    selectedDate: '2024-02-08',
   };
 
   beforeEach(() => {
@@ -17,7 +18,7 @@ describe('RepeatSetting', () => {
   });
 
   describe('기본 기능 테스트', () => {
-    it('모든 필수 입력 필드가 렌더링되어야 한다', () => {
+    it('기본적인 반복 설정 필드들이 렌더링되어야 한다', () => {
       renderWithSetup(<RepeatSetting {...mockProps} />);
 
       expect(screen.getByLabelText('반복 유형')).toBeInTheDocument();
@@ -63,6 +64,59 @@ describe('RepeatSetting', () => {
 
       const input = screen.getByLabelText('반복 간격');
       expect(input).toHaveAttribute('min', '1');
+    });
+  });
+
+  describe('월간 반복 패턴', () => {
+    it('일반적인 날짜의 경우 기본 옵션만 표시된다', () => {
+      renderWithSetup(<RepeatSetting {...mockProps} repeatType="monthly" />);
+
+      const radioButtons = screen.getAllByRole('radio');
+      expect(radioButtons).toHaveLength(2);
+      expect(screen.getByText('8일')).toBeInTheDocument();
+      expect(screen.getByText('2번째 목요일')).toBeInTheDocument();
+    });
+
+    it('마지막 주의 날짜인 경우 마지막 요일 옵션이 추가된다', () => {
+      renderWithSetup(
+        <RepeatSetting {...mockProps} repeatType="monthly" selectedDate="2024-02-28" />
+      );
+
+      const radioButtons = screen.getAllByRole('radio');
+      expect(radioButtons).toHaveLength(3);
+      expect(screen.getByText('28일')).toBeInTheDocument();
+      expect(screen.getByText('4번째 수요일')).toBeInTheDocument();
+      expect(screen.getByText('마지막 수요일')).toBeInTheDocument();
+    });
+
+    it('마지막 날짜인 경우 마지막 날 옵션이 추가된다', () => {
+      renderWithSetup(
+        <RepeatSetting {...mockProps} repeatType="monthly" selectedDate="2024-02-29" />
+      );
+
+      expect(screen.getByText('마지막 날')).toBeInTheDocument();
+    });
+  });
+
+  describe('연간 반복 패턴', () => {
+    it('일반적인 날짜의 경우 기본 옵션만 표시된다', () => {
+      renderWithSetup(<RepeatSetting {...mockProps} repeatType="yearly" />);
+
+      const radioButtons = screen.getAllByRole('radio');
+      expect(radioButtons).toHaveLength(2);
+      expect(screen.getByText('2월 8일')).toBeInTheDocument();
+      expect(screen.getByText('2월 2번째 목요일')).toBeInTheDocument();
+    });
+
+    it('마지막 날짜인 경우 모든 옵션이 표시된다', () => {
+      renderWithSetup(
+        <RepeatSetting {...mockProps} repeatType="yearly" selectedDate="2024-02-29" />
+      );
+
+      expect(screen.getByText('2월 29일')).toBeInTheDocument();
+      expect(screen.getByText('2월 5번째 목요일')).toBeInTheDocument();
+      expect(screen.getByText('2월 마지막 목요일')).toBeInTheDocument();
+      expect(screen.getByText('2월 마지막 날')).toBeInTheDocument();
     });
   });
 });
