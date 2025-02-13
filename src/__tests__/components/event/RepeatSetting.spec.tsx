@@ -1,7 +1,7 @@
 import { screen, fireEvent } from '@testing-library/react';
 
 import RepeatSetting from '../../../components/event/RepeatSetting';
-import { RepeatType } from '../../../types';
+import { RepeatEnd, RepeatType } from '../../../types';
 import { renderWithSetup } from '../../test-utils';
 
 describe('RepeatSetting', () => {
@@ -11,6 +11,7 @@ describe('RepeatSetting', () => {
     repeatEndDate: '2024-02-09',
     updateFormState: vi.fn(),
     selectedDate: '2024-02-08',
+    repeatEnd: 'endDate' as RepeatEnd,
   };
 
   beforeEach(() => {
