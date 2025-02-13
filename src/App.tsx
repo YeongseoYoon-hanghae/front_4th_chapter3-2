@@ -44,7 +44,7 @@ function App() {
       type: formState.isRepeating ? formState.repeatType : 'none',
       interval: formState.repeatInterval,
       endDate: formState.repeatEndDate || undefined,
-      repeatEnd: formState?.repeatEnd ?? 'endDate',
+      repeatEnd: formState?.repeatEnd ?? 'never',
     },
     notificationTime: formState.notificationTime,
   });
@@ -64,10 +64,10 @@ function App() {
     return findOverlappingEvents(eventData, events);
   };
 
-  const saveEventWithRepeat = async (eventData: Event) => {
+  const addNewEvent = async (eventData: Event) => {
     if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
       const repeatEvents = generateRepeatEvents({
-        baseEvent: eventData,
+        baseEvent: { ...eventData, id: undefined },
         repeatType: eventData.repeat.type,
         interval: eventData.repeat.interval,
         endDate: eventData.repeat.endDate,
@@ -79,9 +79,33 @@ function App() {
     }
   };
 
+  const updateEvent = async (eventData: Event) => {
+    const isEditingRepeatEvent = formState.editingEvent?.repeat.type !== 'none';
+
+    if (isEditingRepeatEvent) {
+      await addNewEvent({
+        ...eventData,
+        repeat: {
+          type: 'none',
+          interval: 1,
+          endDate: undefined,
+        },
+      });
+      return;
+    }
+
+    await addNewEvent(eventData);
+  };
+
   const addOrUpdateEvent = async () => {
     const eventData = createEventData();
-    await saveEventWithRepeat(eventData);
+
+    if (formState.editingEvent) {
+      await updateEvent(eventData);
+    } else {
+      await addNewEvent(eventData);
+    }
+
     formHandlers.resetForm();
   };
 

@@ -36,14 +36,14 @@ export const EventList = ({
       ) : (
         events.map((event) => {
           const isRepeating = !!event.repeat.type && event.repeat.type !== 'none';
-          const isNotified = notifiedEvents.includes(event.id);
+          const isNotified = notifiedEvents.includes(event.id || '');
           return (
             <EventItem
               key={event.id}
               event={event}
               isNotified={isNotified}
               onEdit={() => onEdit(event)}
-              onDelete={() => onDelete(event.id)}
+              onDelete={() => onDelete(event.id || '')}
               isRepeating={isRepeating}
             />
           );

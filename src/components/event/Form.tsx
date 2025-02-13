@@ -39,6 +39,8 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
 
   const { updateFormState, handleStartTimeChange, handleEndTimeChange } = formHandlers;
 
+  const isEditingRepeatEvent = editingEvent ? editingEvent.repeat.type !== 'none' : false;
+
   return (
     <VStack w="400px" spacing={5} align="stretch">
       <Heading>{editingEvent ? '일정 수정' : '일정 추가'}</Heading>
@@ -111,8 +113,14 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
         <FormLabel>반복 설정</FormLabel>
         <Checkbox
           isChecked={isRepeating}
-          onChange={(e) => updateFormState({ isRepeating: e.target.checked })}
-          disabled={!date}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            updateFormState({
+              isRepeating: checked,
+              repeatType: checked ? 'daily' : 'none',
+            });
+          }}
+          disabled={!date || isEditingRepeatEvent}
         >
           반복 일정
         </Checkbox>
@@ -132,11 +140,13 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
         </Select>
       </FormControl>
 
-      {isRepeating && (
+      {isRepeating && !isEditingRepeatEvent && (
         <RepeatSetting
           repeatType={formState.repeatType}
           repeatInterval={formState.repeatInterval}
           repeatEndDate={formState.repeatEndDate}
+          repeatEnd={formState.repeatEnd}
+          repeatEndCount={formState.repeatEndCount}
           updateFormState={updateFormState}
           selectedDate={date}
         />

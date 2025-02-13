@@ -8,6 +8,7 @@ export interface RepeatInfo {
   endDate?: string;
   pattern?: RepeatPattern;
   repeatEnd?: RepeatEnd;
+  endCount?: number;
 }
 
 export interface Event {
@@ -46,6 +47,7 @@ export interface FormState {
   repeatEndDate: string;
   repeatPattern?: RepeatPattern;
   repeatEnd: RepeatEnd;
+  repeatEndCount: number;
   notificationTime: number;
   startTimeError: string | null;
   endTimeError: string | null;

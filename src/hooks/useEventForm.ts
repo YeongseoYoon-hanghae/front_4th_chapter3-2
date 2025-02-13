@@ -21,7 +21,8 @@ export const useEventForm = (initialEvent?: Event) => {
     startTimeError: null,
     endTimeError: null,
     editingEvent: null,
-    repeatEnd: initialEvent?.repeat.repeatEnd || 'endDate',
+    repeatEnd: initialEvent?.repeat.repeatEnd || 'never',
+    repeatEndCount: initialEvent?.repeat.endCount || 1,
   });
 
   const updateFormState = (updates: Partial<FormState>) => {
@@ -65,7 +66,8 @@ export const useEventForm = (initialEvent?: Event) => {
       startTimeError: null,
       endTimeError: null,
       editingEvent: null,
-      repeatEnd: 'endDate',
+      repeatEnd: 'never',
+      repeatEndCount: 1,
     });
   };
 
@@ -74,23 +76,19 @@ export const useEventForm = (initialEvent?: Event) => {
       resetForm();
       return;
     }
+
     setFormState({
-      title: event.title,
-      date: event.date,
-      startTime: event.startTime,
-      endTime: event.endTime,
-      description: event.description,
-      location: event.location,
-      category: event.category,
-      isRepeating: event.repeat.type !== 'none',
-      repeatType: event.repeat.type,
-      repeatInterval: event.repeat.interval,
-      repeatEndDate: event.repeat.endDate || '',
+      ...event,
+      editingEvent: event,
+      isRepeating: event.repeat.type !== 'none' && event.repeat?.type !== undefined,
+      repeatType: event.repeat?.type || 'none',
+      repeatInterval: event.repeat?.interval || 1,
+      repeatEndDate: event.repeat?.endDate || '',
+      repeatEnd: event.repeat?.repeatEnd || 'never',
       notificationTime: event.notificationTime,
       startTimeError: null,
       endTimeError: null,
-      editingEvent: event,
-      repeatEnd: event.repeat.repeatEnd || 'endDate',
+      repeatEndCount: event.repeat?.endCount || 1,
     });
   };
 

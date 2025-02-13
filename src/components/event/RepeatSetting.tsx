@@ -17,6 +17,7 @@ interface RepeatSettingProps {
   repeatInterval: number;
   repeatEndDate: string;
   repeatEnd: RepeatEnd;
+  repeatEndCount: number;
   selectedDate: string;
   updateFormState: (state: Partial<FormState>) => void;
 }
@@ -26,6 +27,7 @@ const RepeatSetting = ({
   repeatInterval,
   repeatEndDate,
   repeatEnd,
+  repeatEndCount,
   selectedDate,
   updateFormState,
 }: RepeatSettingProps) => {
@@ -207,6 +209,17 @@ const RepeatSetting = ({
             )}
 
             <Radio value="endCount">횟수</Radio>
+            {repeatEnd === 'endCount' && (
+              <FormControl>
+                <FormLabel>반복 종료 횟수</FormLabel>
+                <Input
+                  type="number"
+                  value={repeatEndCount}
+                  onChange={(e) => updateFormState({ repeatEndCount: Number(e.target.value) })}
+                  min={1}
+                />
+              </FormControl>
+            )}
           </VStack>
         </RadioGroup>
       </FormControl>
