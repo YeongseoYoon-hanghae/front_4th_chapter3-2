@@ -1,12 +1,16 @@
 import { Event, RepeatPattern, RepeatType } from '../types';
 
-export const generateRepeatEvents = (
-  baseEvent: Event,
-  repeatType: RepeatType,
-  interval: number,
-  endDate: string,
-  repeatPattern?: RepeatPattern
-): Event[] => {
+type GenerateRepeatedEventsOptions = {
+  baseEvent: Event;
+  repeatType: RepeatType;
+  interval: number;
+  endDate: string;
+  repeatPattern?: RepeatPattern;
+  endCount?: number;
+};
+
+export const generateRepeatEvents = (options: GenerateRepeatedEventsOptions): Event[] => {
+  const { baseEvent, repeatType, interval, endDate, repeatPattern } = options;
   const generatedEvents: Event[] = [];
   const eventStartDate = DateUtils.initializeDate(baseEvent.date);
   const eventEndDate = DateUtils.initializeDate(endDate);
@@ -271,6 +275,10 @@ export const generateRepeatEvents = (
     } else {
       addEventToList(iterationDate);
     }
+  }
+
+  if (options?.endCount) {
+    return generatedEvents.slice(0, options.endCount);
   }
 
   return generatedEvents;

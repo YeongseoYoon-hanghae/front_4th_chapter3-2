@@ -1,26 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 
-import { Event, RepeatPattern, RepeatType } from '../types';
+import { Event, FormState } from '../types';
 import { getTimeErrorMessage } from '../utils/timeValidation';
-
-interface FormState {
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  description: string;
-  location: string;
-  category: string;
-  isRepeating: boolean;
-  repeatType: RepeatType;
-  repeatInterval: number;
-  repeatEndDate: string;
-  notificationTime: number;
-  startTimeError: string | null;
-  endTimeError: string | null;
-  editingEvent: Event | null;
-  repeatPattern?: RepeatPattern;
-}
 
 export const useEventForm = (initialEvent?: Event) => {
   const [formState, setFormState] = useState<FormState>({
@@ -40,6 +21,7 @@ export const useEventForm = (initialEvent?: Event) => {
     startTimeError: null,
     endTimeError: null,
     editingEvent: null,
+    repeatEnd: initialEvent?.repeat.repeatEnd || 'endDate',
   });
 
   const updateFormState = (updates: Partial<FormState>) => {
@@ -83,6 +65,7 @@ export const useEventForm = (initialEvent?: Event) => {
       startTimeError: null,
       endTimeError: null,
       editingEvent: null,
+      repeatEnd: 'endDate',
     });
   };
 
@@ -107,6 +90,7 @@ export const useEventForm = (initialEvent?: Event) => {
       startTimeError: null,
       endTimeError: null,
       editingEvent: event,
+      repeatEnd: event.repeat.repeatEnd || 'endDate',
     });
   };
 

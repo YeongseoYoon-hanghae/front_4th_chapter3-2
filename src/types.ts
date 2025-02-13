@@ -7,6 +7,7 @@ export interface RepeatInfo {
   interval: number;
   endDate?: string;
   pattern?: RepeatPattern;
+  repeatEnd?: RepeatEnd;
 }
 
 export interface Event {
@@ -29,6 +30,8 @@ export interface Notification {
 
 export type RepeatPattern = 'exact' | 'nthWeekday' | 'lastWeekday' | 'lastDay';
 
+export type RepeatEnd = 'never' | 'endDate' | 'endCount';
+
 export interface FormState {
   title: string;
   date: string;
@@ -42,6 +45,7 @@ export interface FormState {
   repeatInterval: number;
   repeatEndDate: string;
   repeatPattern?: RepeatPattern;
+  repeatEnd: RepeatEnd;
   notificationTime: number;
   startTimeError: string | null;
   endTimeError: string | null;

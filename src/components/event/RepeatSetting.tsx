@@ -9,13 +9,14 @@ import {
   RadioGroup,
 } from '@chakra-ui/react';
 
-import { FormState, RepeatPattern, RepeatType } from '../../types';
+import { FormState, RepeatPattern, RepeatEnd, RepeatType } from '../../types';
 import { isLastDayOfMonth, isLastWeekOfMonth } from '../../utils/dateUtils';
 
 interface RepeatSettingProps {
   repeatType: RepeatType;
   repeatInterval: number;
   repeatEndDate: string;
+  repeatEnd: RepeatEnd;
   selectedDate: string;
   updateFormState: (state: Partial<FormState>) => void;
 }
@@ -24,6 +25,7 @@ const RepeatSetting = ({
   repeatType,
   repeatInterval,
   repeatEndDate,
+  repeatEnd,
   selectedDate,
   updateFormState,
 }: RepeatSettingProps) => {
@@ -182,15 +184,32 @@ const RepeatSetting = ({
             min={1}
           />
         </FormControl>
-        <FormControl>
-          <FormLabel>반복 종료일</FormLabel>
-          <Input
-            type="date"
-            value={repeatEndDate}
-            onChange={(e) => updateFormState({ repeatEndDate: e.target.value })}
-          />
-        </FormControl>
       </HStack>
+
+      <FormControl>
+        <FormLabel>반복 종료</FormLabel>
+        <RadioGroup
+          defaultValue="never"
+          onChange={(value: RepeatEnd) => updateFormState({ repeatEnd: value })}
+        >
+          <VStack align="start">
+            <Radio value="never">없음</Radio>
+            <Radio value="endDate">날짜</Radio>
+            {repeatEnd === 'endDate' && (
+              <FormControl>
+                <FormLabel>반복 종료일</FormLabel>
+                <Input
+                  type="date"
+                  value={repeatEndDate}
+                  onChange={(e) => updateFormState({ repeatEndDate: e.target.value })}
+                />
+              </FormControl>
+            )}
+
+            <Radio value="endCount">횟수</Radio>
+          </VStack>
+        </RadioGroup>
+      </FormControl>
     </VStack>
   );
 };

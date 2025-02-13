@@ -13,7 +13,7 @@ import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
 import { Event } from './types';
 import { findOverlappingEvents } from './utils/eventOverlap';
-import { generateRepeatEvents } from './utils/repeatUtils.ts';
+import { generateRepeatEvents } from './utils/repeatUtils';
 
 function App() {
   const { formState, formHandlers } = useEventForm();
@@ -51,13 +51,13 @@ function App() {
 
   const checkOverlappingEvents = (eventData: Event): Event[] => {
     if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
-      const repeatEvents = generateRepeatEvents(
-        eventData,
-        eventData.repeat.type,
-        eventData.repeat.interval,
-        eventData.repeat.endDate,
-        formState.repeatPattern
-      );
+      const repeatEvents = generateRepeatEvents({
+        baseEvent: eventData,
+        repeatType: eventData.repeat.type,
+        interval: eventData.repeat.interval,
+        endDate: eventData.repeat.endDate,
+        repeatPattern: formState.repeatPattern,
+      });
       return repeatEvents.flatMap((event) => findOverlappingEvents(event, events));
     }
 
@@ -66,13 +66,13 @@ function App() {
 
   const saveEventWithRepeat = async (eventData: Event) => {
     if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
-      const repeatEvents = generateRepeatEvents(
-        eventData,
-        eventData.repeat.type,
-        eventData.repeat.interval,
-        eventData.repeat.endDate,
-        formState.repeatPattern
-      );
+      const repeatEvents = generateRepeatEvents({
+        baseEvent: eventData,
+        repeatType: eventData.repeat.type,
+        interval: eventData.repeat.interval,
+        endDate: eventData.repeat.endDate,
+        repeatPattern: formState.repeatPattern,
+      });
       await saveEventList(repeatEvents);
     } else {
       await saveEvent(eventData);
