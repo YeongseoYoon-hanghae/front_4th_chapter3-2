@@ -8,7 +8,6 @@ import {
 } from '../__mocks__/handlersUtils';
 import App from '../App';
 import { renderWithSetup } from './test-utils';
-import { RepeatType } from '../types';
 
 beforeAll(() => {
   vi.setSystemTime(new Date('2024-10-17T09:00:00.000Z'));
@@ -447,24 +446,7 @@ describe('일정 알림 테스트', () => {
   });
 });
 
-describe('반복 일정 생성', () => {
-  const sampleEvent = {
-    id: '1',
-    title: '테스트 회의',
-    date: '2024-10-17',
-    startTime: '09:00',
-    endTime: '10:00',
-    description: '',
-    location: '',
-    category: '업무',
-    repeat: {
-      type: 'none' as RepeatType,
-      interval: 1,
-      endDate: undefined,
-    },
-    notificationTime: 10,
-  };
-
+describe('반복 일정', () => {
   describe('반복 유형 선택', () => {
     it('날짜를 선택하지 않은 경우엔 반복 일정 체크박스가 disable 되며 반복 유형을 선택할 수 없다.', async () => {
       renderWithSetup(<App />);
@@ -496,26 +478,123 @@ describe('반복 일정 생성', () => {
       expect(repeatTypes).toContain('매월');
       expect(repeatTypes).toContain('매년');
     });
+  });
+});
 
-    it('일정 수정 시에도 반복 유형을 변경할 수 있어야 한다.', async () => {
-      setupMockHandlerUpdating([sampleEvent]);
-      const { user } = renderWithSetup(<App />);
+describe('반복 일정 수정', () => {
+  const sampleEvent = {
+    id: '1',
+    title: '반복 일정',
+    date: '2024-10-17',
+    startTime: '14:00',
+    endTime: '15:00',
+    description: '주간 회의',
+    location: '회의실 A',
+    category: '업무',
+    repeat: {
+      type: 'daily' as const,
+      interval: 1,
+      endDate: '2024-10-24',
+    },
+    notificationTime: 10,
+  };
 
-      const editButtons = await screen.findAllByLabelText('Edit event');
-      await user.click(editButtons[0]);
+  it('반복 일정을 수정하면 단일 일정으로 변경된다.', async () => {
+    setupMockHandlerCreation([sampleEvent]);
+    const { user } = renderWithSetup(<App />);
 
-      const repeatCheckbox = screen.getByRole('checkbox', { name: /반복 일정/i });
-      await user.click(repeatCheckbox);
+    const eventList = await screen.findByTestId('event-list');
 
-      const repeatTypeSelect = screen.getByLabelText('반복 유형');
-      await user.selectOptions(repeatTypeSelect, 'weekly');
+    const editButton = await within(eventList).findByLabelText('Edit event');
 
-      await user.click(screen.getByTestId('event-submit-button'));
+    await user.click(editButton);
 
-      const events = await screen.findAllByText('테스트 회의');
-      expect(events.length).toBeGreaterThan(1);
-    });
+    await user.type(screen.getByLabelText('제목'), '단일 일정');
+    await user.type(screen.getByLabelText('날짜'), '2025-02-13');
+    await user.type(screen.getByLabelText('시작 시간'), '14:00');
+    await user.type(screen.getByLabelText('종료 시간'), '15:00');
 
+    const checkbox = screen.getByLabelText('반복 일정');
+
+    expect(checkbox).toHaveAttribute('aria-disabled', 'true');
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    expect(within(eventList).queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
   });
 
+  it('단일 일정을 반복 일정으로 수정할 수 있다.', async () => {
+    const singleEvent = {
+      ...sampleEvent,
+      repeat: {
+        type: 'none' as const,
+        interval: 1,
+        endDate: undefined,
+      },
+    };
+
+    setupMockHandlerCreation([singleEvent]);
+
+    const { user, rerender } = renderWithSetup(<App />);
+
+    const eventList = await screen.findByTestId('event-list');
+
+    const editButton = await within(eventList).findByLabelText('Edit event');
+
+    await user.click(editButton);
+
+    await user.clear(screen.getByLabelText('제목'));
+    await user.type(screen.getByLabelText('제목'), '반복 일정');
+    await user.clear(screen.getByLabelText('날짜'));
+    await user.type(screen.getByLabelText('날짜'), '2025-02-13');
+    await user.type(screen.getByLabelText('시작 시간'), '14:00');
+    await user.type(screen.getByLabelText('종료 시간'), '15:00');
+
+    const repeatCheckbox = screen.getByLabelText('반복 일정');
+    await user.click(repeatCheckbox);
+
+    rerender(<App />);
+
+    const repeatTypeSelect = await screen.findByLabelText('반복 유형');
+    expect(repeatTypeSelect).toBeInTheDocument();
+    await user.type(repeatTypeSelect, '매일');
+    const neverRadio = screen.getByRole('radio', { name: '없음' });
+    await user.click(neverRadio);
+
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    screen.debug(eventList);
+
+    expect(await within(eventList).findByLabelText('repeat-clock-icon')).toBeInTheDocument();
+  });
+
+  it('단일 일정을 단일 일정으로 수정할 수 있다.', async () => {
+    const singleEvent = {
+      ...sampleEvent,
+      repeat: {
+        type: 'none' as const,
+        interval: 1,
+        endDate: undefined,
+      },
+    };
+
+    setupMockHandlerCreation([singleEvent]);
+    const { user } = renderWithSetup(<App />);
+
+    const eventList = await screen.findByTestId('event-list');
+
+    const editButton = await within(eventList).findByLabelText('Edit event');
+
+    await user.click(editButton);
+
+    await user.clear(screen.getByLabelText('제목'));
+    await user.type(screen.getByLabelText('제목'), '단일 일정 수정');
+    await user.clear(screen.getByLabelText('날짜'));
+    await user.type(screen.getByLabelText('날짜'), '2025-02-13');
+    await user.type(screen.getByLabelText('시작 시간'), '14:00');
+    await user.type(screen.getByLabelText('종료 시간'), '15:00');
+
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    expect(within(eventList).queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
+  });
 });
