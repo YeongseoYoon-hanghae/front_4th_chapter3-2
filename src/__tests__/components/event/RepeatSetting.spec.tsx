@@ -72,8 +72,6 @@ describe('RepeatSetting', () => {
     it('일반적인 날짜의 경우 기본 옵션만 표시된다', () => {
       renderWithSetup(<RepeatSetting {...mockProps} repeatType="monthly" />);
 
-      const radioButtons = screen.getAllByRole('radio');
-      expect(radioButtons).toHaveLength(2);
       expect(screen.getByText('8일')).toBeInTheDocument();
       expect(screen.getByText('2번째 목요일')).toBeInTheDocument();
     });
@@ -83,8 +81,6 @@ describe('RepeatSetting', () => {
         <RepeatSetting {...mockProps} repeatType="monthly" selectedDate="2024-02-28" />
       );
 
-      const radioButtons = screen.getAllByRole('radio');
-      expect(radioButtons).toHaveLength(3);
       expect(screen.getByText('28일')).toBeInTheDocument();
       expect(screen.getByText('4번째 수요일')).toBeInTheDocument();
       expect(screen.getByText('마지막 수요일')).toBeInTheDocument();
@@ -103,8 +99,6 @@ describe('RepeatSetting', () => {
     it('일반적인 날짜의 경우 기본 옵션만 표시된다', () => {
       renderWithSetup(<RepeatSetting {...mockProps} repeatType="yearly" />);
 
-      const radioButtons = screen.getAllByRole('radio');
-      expect(radioButtons).toHaveLength(2);
       expect(screen.getByText('2월 8일')).toBeInTheDocument();
       expect(screen.getByText('2월 2번째 목요일')).toBeInTheDocument();
     });

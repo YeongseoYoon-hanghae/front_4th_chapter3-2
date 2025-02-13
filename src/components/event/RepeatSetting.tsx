@@ -17,7 +17,7 @@ interface RepeatSettingProps {
   repeatInterval: number;
   repeatEndDate: string;
   repeatEnd: RepeatEnd;
-  repeatEndCount: number;
+  repeatEndCount?: number;
   selectedDate: string;
   updateFormState: (state: Partial<FormState>) => void;
 }

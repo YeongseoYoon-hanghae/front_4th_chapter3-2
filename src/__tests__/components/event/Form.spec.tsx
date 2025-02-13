@@ -24,6 +24,8 @@ describe('EventForm', () => {
     startTimeError: null,
     endTimeError: null,
     editingEvent: null,
+    repeatEndCount: 1,
+    repeatEnd: 'never',
   };
 
   const mockHandlers = {
@@ -141,7 +143,10 @@ describe('EventForm', () => {
       const repeatCheckbox = screen.getByLabelText('반복 일정');
       await user.click(repeatCheckbox);
 
-      expect(mockHandlers.updateFormState).toHaveBeenCalledWith({ isRepeating: true });
+      expect(mockHandlers.updateFormState).toHaveBeenCalledWith({
+        isRepeating: true,
+        repeatType: 'daily',
+      });
     });
   });
 
@@ -157,7 +162,8 @@ describe('EventForm', () => {
 
       expect(screen.getByLabelText('반복 유형')).toBeInTheDocument();
       expect(screen.getByLabelText('반복 간격')).toBeInTheDocument();
-      expect(screen.getByLabelText('반복 종료일')).toBeInTheDocument();
+      expect(screen.getByText('반복 종료')).toBeInTheDocument();
+      expect(screen.getByLabelText('없음')).toBeInTheDocument();
     });
   });
 
