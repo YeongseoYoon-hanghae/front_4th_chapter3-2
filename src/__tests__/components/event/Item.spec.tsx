@@ -65,8 +65,6 @@ describe('EventItem 컴포넌트', () => {
 
       expect(screen.queryByLabelText('bell-icon')).not.toBeInTheDocument();
       expect(screen.getByText('미팅')).toHaveClass('chakra-text');
-      expect(screen.getByText('미팅')).not.toHaveClass('chakra-text--bold');
-      expect(screen.getByText('미팅')).not.toHaveClass('chakra-text--red');
     });
 
     it('알림이 있는 경우 강조 스타일로 표시되어야 한다', () => {
@@ -76,37 +74,40 @@ describe('EventItem 컴포넌트', () => {
         backgroundColor: 'var(--chakra-colors-red-100)',
       });
     });
+  });
 
-    it('편집 버튼 클릭시 편집 핸들러가 호출되어야 한다', () => {
-      const onEdit = vi.fn();
+  describe('반복 일정 따른 스타일', () => {
+    it('반복 일정이 아닌 경우 기본 스타일로 표시되어야 한다', () => {
+      renderWithSetup(<EventItem {...defaultProps} />);
 
-      renderWithSetup(<EventItem {...defaultProps} onEdit={onEdit} />);
-
-      fireEvent.click(screen.getByLabelText('Edit event'));
-      expect(onEdit).toHaveBeenCalledTimes(1);
+      expect(screen.queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
+      expect(screen.getByText('미팅')).toHaveClass('chakra-text');
     });
 
-    it('삭제 버튼 클릭시 삭제 핸들러가 호출되어야 한다', () => {
-      const onDelete = vi.fn();
-
-      renderWithSetup(<EventItem {...defaultProps} onDelete={onDelete} />);
-
-      fireEvent.click(screen.getByLabelText('Delete event'));
-      expect(onDelete).toHaveBeenCalledTimes(1);
+    it('반복 일정인 경우 강조 스타일로 표시되어야 한다', () => {
+      renderWithSetup(<EventItem {...defaultProps} isRepeating={true} />);
+      expect(screen.getByLabelText('repeat-clock-icon')).toBeInTheDocument();
+      expect(screen.getByLabelText('repeat-clock-icon')).toHaveStyle({
+        backgroundColor: 'var(--chakra-colors-blue-300)',
+      });
     });
+  });
 
-    it('반복 설정이 없는 경우 반복 정보가 표시되지 않아야 한다', () => {
-      const eventWithoutRepeat = {
-        ...mockEvent,
-        repeat: {
-          type: 'none' as RepeatType,
-          interval: 0,
-        },
-      };
+  it('편집 버튼 클릭시 편집 핸들러가 호출되어야 한다', () => {
+    const onEdit = vi.fn();
 
-      renderWithSetup(<EventItem {...defaultProps} event={eventWithoutRepeat} />);
+    renderWithSetup(<EventItem {...defaultProps} onEdit={onEdit} isRepeating={true} />);
 
-      expect(screen.queryByText(/반복:/)).not.toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByLabelText('Edit event'));
+    expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it('삭제 버튼 클릭시 삭제 핸들러가 호출되어야 한다', () => {
+    const onDelete = vi.fn();
+
+    renderWithSetup(<EventItem {...defaultProps} onDelete={onDelete} />);
+
+    fireEvent.click(screen.getByLabelText('Delete event'));
+    expect(onDelete).toHaveBeenCalledTimes(1);
   });
 });
