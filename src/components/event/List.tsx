@@ -34,15 +34,20 @@ export const EventList = ({
       {events.length === 0 ? (
         <Text>검색 결과가 없습니다.</Text>
       ) : (
-        events.map((event) => (
-          <EventItem
-            key={event.id}
-            event={event}
-            isNotified={notifiedEvents.includes(event.id)}
-            onEdit={() => onEdit(event)}
-            onDelete={() => onDelete(event.id)}
-          />
-        ))
+        events.map((event) => {
+          const isRepeating = !!event.repeat.type && event.repeat.type !== 'none';
+          const isNotified = notifiedEvents.includes(event.id);
+          return (
+            <EventItem
+              key={event.id}
+              event={event}
+              isNotified={isNotified}
+              onEdit={() => onEdit(event)}
+              onDelete={() => onDelete(event.id)}
+              isRepeating={isRepeating}
+            />
+          );
+        })
       )}
     </VStack>
   );

@@ -36,7 +36,16 @@ export const WeekView = ({ currentDate, events, notifiedEvents }: WeekViewProps)
                   .filter((event) => new Date(event.date).toDateString() === date.toDateString())
                   .map((event) => {
                     const isNotified = notifiedEvents.includes(event.id);
-                    return <EventBox key={event.id} event={event} isNotified={isNotified} />;
+                    const isRepeating = !!event.repeat.type && event.repeat.type !== 'none';
+
+                    return (
+                      <EventBox
+                        key={event.id}
+                        event={event}
+                        isNotified={isNotified}
+                        isRepeating={isRepeating}
+                      />
+                    );
                   })}
               </Td>
             ))}

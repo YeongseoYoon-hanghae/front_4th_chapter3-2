@@ -1,4 +1,4 @@
-import { BellIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { BellIcon, DeleteIcon, EditIcon, RepeatClockIcon } from '@chakra-ui/icons';
 import { Box, HStack, VStack, Text, IconButton } from '@chakra-ui/react';
 
 import { NOTIFICATION_OPTIONS } from '../../policy';
@@ -6,21 +6,31 @@ import { Event } from '../../types';
 
 interface EventItemProps {
   event: Event;
-  isNotified: boolean;
+  isRepeating?: boolean;
+  isNotified?: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-export const EventItem = ({ event, isNotified, onEdit, onDelete }: EventItemProps) => {
+export const EventItem = ({
+  event,
+  isNotified = false,
+  onEdit,
+  onDelete,
+  isRepeating = false,
+}: EventItemProps) => {
   return (
     <Box borderWidth={1} borderRadius="lg" p={3} width="100%">
       <HStack justifyContent="space-between">
         <VStack align="start">
           <HStack>
             {isNotified && <BellIcon color="red.500" aria-label="bell-icon" />}
+            {!isNotified && isRepeating && (
+              <RepeatClockIcon color="blue.300" aria-label="repeat-clock-icon" />
+            )}
             <Text
               fontWeight={isNotified ? 'bold' : 'normal'}
-              color={isNotified ? 'red.500' : 'inherit'}
+              color={isNotified ? 'red.500' : isRepeating ? 'blue.300' : 'inherit'}
             >
               {event.title}
             </Text>
