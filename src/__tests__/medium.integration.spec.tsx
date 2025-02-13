@@ -519,7 +519,9 @@ describe('반복 일정 수정', () => {
     expect(checkbox).toHaveAttribute('aria-disabled', 'true');
     await user.click(screen.getByTestId('event-submit-button'));
 
-    expect(within(eventList).queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
+    });
   });
 
   it('단일 일정을 반복 일정으로 수정할 수 있다.', async () => {
@@ -532,9 +534,9 @@ describe('반복 일정 수정', () => {
       },
     };
 
-    setupMockHandlerCreation([singleEvent]);
+    setupMockHandlerUpdating([singleEvent]);
 
-    const { user, rerender } = renderWithSetup(<App />);
+    const { user } = renderWithSetup(<App />);
 
     const eventList = await screen.findByTestId('event-list');
 
@@ -545,24 +547,23 @@ describe('반복 일정 수정', () => {
     await user.clear(screen.getByLabelText('제목'));
     await user.type(screen.getByLabelText('제목'), '반복 일정');
     await user.clear(screen.getByLabelText('날짜'));
-    await user.type(screen.getByLabelText('날짜'), '2025-02-13');
+    await user.type(screen.getByLabelText('날짜'), '2024-10-19');
     await user.type(screen.getByLabelText('시작 시간'), '14:00');
     await user.type(screen.getByLabelText('종료 시간'), '15:00');
 
     const repeatCheckbox = screen.getByLabelText('반복 일정');
     await user.click(repeatCheckbox);
 
-    rerender(<App />);
-
     const repeatTypeSelect = await screen.findByLabelText('반복 유형');
-    expect(repeatTypeSelect).toBeInTheDocument();
-    await user.type(repeatTypeSelect, '매일');
-    const neverRadio = screen.getByRole('radio', { name: '없음' });
-    await user.click(neverRadio);
+    await user.selectOptions(repeatTypeSelect, 'daily');
+
+    const endCountRadio = screen.getByRole('radio', { name: '횟수' });
+    await user.click(endCountRadio);
+
+    const endCountInput = await screen.findByLabelText('횟수');
+    await user.type(endCountInput, '2');
 
     await user.click(screen.getByTestId('event-submit-button'));
-
-    screen.debug(eventList);
 
     expect(await within(eventList).findByLabelText('repeat-clock-icon')).toBeInTheDocument();
   });
