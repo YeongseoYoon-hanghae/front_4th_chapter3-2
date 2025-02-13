@@ -121,6 +121,7 @@ export const EventForm = ({ formState, formHandlers, onSubmit }: EventFormProps)
             });
           }}
           disabled={!date || isEditingRepeatEvent}
+          aria-label="반복 설정"
         >
           반복 일정
         </Checkbox>

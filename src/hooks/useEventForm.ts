@@ -42,6 +42,7 @@ export const useEventForm = (initialEvent?: Event) => {
   const handleEndTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newEndTime = e.target.value;
     const timeErrors = getTimeErrorMessage(formState.startTime, newEndTime);
+
     updateFormState({
       endTime: newEndTime,
       startTimeError: timeErrors.startTimeError,
