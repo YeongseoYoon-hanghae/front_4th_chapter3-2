@@ -1,7 +1,7 @@
 import { useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
-import { Event, EventFormType } from '../types';
+import { Event } from '../types';
 
 export const useEventOperations = (editing: boolean, onSave?: () => void) => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -26,7 +26,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     }
   };
 
-  const saveEvent = async (eventData: Event | EventFormType) => {
+  const saveEvent = async (eventData: Event) => {
     try {
       let response;
       if (editing) {
@@ -92,6 +92,98 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     }
   };
 
+  const saveEventList = async (events: Event[]) => {
+    try {
+      const response = await fetch('/api/events-list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ events }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save events');
+      }
+
+      await fetchEvents();
+      onSave?.();
+      toast({
+        title: '반복 일정이 추가되었습니다.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error saving events:', error);
+      toast({
+        title: '반복 일정 저장 실패',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const updateEventList = async (events: Event[]) => {
+    try {
+      const response = await fetch('/api/events-list', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ events }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update events');
+      }
+
+      await fetchEvents();
+      onSave?.();
+      toast({
+        title: '반복 일정이 수정되었습니다.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error updating events:', error);
+      toast({
+        title: '반복 일정 수정 실패',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const deleteEventList = async (eventIds: string[]) => {
+    try {
+      const response = await fetch('/api/events-list', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventIds }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete events');
+      }
+
+      await fetchEvents();
+      toast({
+        title: '반복 일정이 삭제되었습니다.',
+        status: 'info',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error deleting events:', error);
+      toast({
+        title: '반복 일정 삭제 실패',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   async function init() {
     await fetchEvents();
     toast({
@@ -106,5 +198,13 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { events, fetchEvents, saveEvent, deleteEvent };
+  return {
+    events,
+    fetchEvents,
+    saveEvent,
+    deleteEvent,
+    saveEventList,
+    updateEventList,
+    deleteEventList,
+  };
 };

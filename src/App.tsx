@@ -11,12 +11,13 @@ import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
 import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
-import { Event, EventFormType } from './types';
+import { Event } from './types';
 import { findOverlappingEvents } from './utils/eventOverlap';
+import { generateRepeatEvents } from './utils/repeatUtils.ts';
 
 function App() {
   const { formState, formHandlers } = useEventForm();
-  const { events, saveEvent, deleteEvent } = useEventOperations(
+  const { events, saveEvent, deleteEvent, saveEventList } = useEventOperations(
     Boolean(formState.editingEvent),
     () => formHandlers.editEvent(null)
   );
@@ -30,7 +31,61 @@ function App() {
 
   const toast = useToast();
 
+  const createEventData = (): Event => ({
+    id: formState.editingEvent ? formState.editingEvent.id : undefined,
+    title: formState.title,
+    date: formState.date,
+    startTime: formState.startTime,
+    endTime: formState.endTime,
+    description: formState.description,
+    location: formState.location,
+    category: formState.category,
+    repeat: {
+      type: formState.isRepeating ? formState.repeatType : 'none',
+      interval: formState.repeatInterval,
+      endDate: formState.repeatEndDate || undefined,
+      repeatEnd: formState?.repeatEnd ?? 'endDate',
+    },
+    notificationTime: formState.notificationTime,
+  });
+
+  const checkOverlappingEvents = (eventData: Event): Event[] => {
+    if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
+      const repeatEvents = generateRepeatEvents(
+        eventData,
+        eventData.repeat.type,
+        eventData.repeat.interval,
+        eventData.repeat.endDate,
+        formState.repeatPattern
+      );
+      return repeatEvents.flatMap((event) => findOverlappingEvents(event, events));
+    }
+
+    return findOverlappingEvents(eventData, events);
+  };
+
+  const saveEventWithRepeat = async (eventData: Event) => {
+    if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
+      const repeatEvents = generateRepeatEvents(
+        eventData,
+        eventData.repeat.type,
+        eventData.repeat.interval,
+        eventData.repeat.endDate,
+        formState.repeatPattern
+      );
+      await saveEventList(repeatEvents);
+    } else {
+      await saveEvent(eventData);
+    }
+  };
+
   const addOrUpdateEvent = async () => {
+    const eventData = createEventData();
+    await saveEventWithRepeat(eventData);
+    formHandlers.resetForm();
+  };
+
+  const handleSave = () => {
     if (!formState.title || !formState.date || !formState.startTime || !formState.endTime) {
       toast({
         title: '필수 정보를 모두 입력해주세요.',
@@ -51,37 +106,21 @@ function App() {
       return;
     }
 
-    const eventData: Event | EventFormType = {
-      id: formState.editingEvent ? formState.editingEvent.id : undefined,
-      title: formState.title,
-      date: formState.date,
-      startTime: formState.startTime,
-      endTime: formState.endTime,
-      description: formState.description,
-      location: formState.location,
-      category: formState.category,
-      repeat: {
-        type: formState.isRepeating ? formState.repeatType : 'none',
-        interval: formState.repeatInterval,
-        endDate: formState.repeatEndDate || undefined,
-      },
-      notificationTime: formState.notificationTime,
-    };
-
-    const overlapping = findOverlappingEvents(eventData, events);
+    const eventData = createEventData();
+    const overlapping = checkOverlappingEvents(eventData);
     if (overlapping.length > 0) {
       setOverlappingEvents(overlapping);
       setIsOverlapDialogOpen(true);
-    } else {
-      await saveEvent(eventData);
-      formHandlers.resetForm();
+      return;
     }
+
+    addOrUpdateEvent();
   };
 
   return (
     <Box w="full" h="100vh" m="auto" p={5}>
       <Flex gap={6} h="full">
-        <EventForm formState={formState} formHandlers={formHandlers} onSubmit={addOrUpdateEvent} />
+        <EventForm formState={formState} formHandlers={formHandlers} onSubmit={handleSave} />
 
         <Calendar
           events={filteredEvents}
@@ -110,22 +149,7 @@ function App() {
         cancelRef={cancelRef}
         onConfirm={() => {
           setIsOverlapDialogOpen(false);
-          saveEvent({
-            id: formState.editingEvent ? formState.editingEvent.id : undefined,
-            title: formState.title,
-            date: formState.date,
-            startTime: formState.startTime,
-            endTime: formState.endTime,
-            description: formState.description,
-            location: formState.location,
-            category: formState.category,
-            repeat: {
-              type: formState.isRepeating ? formState.repeatType : 'none',
-              interval: formState.repeatInterval,
-              endDate: formState.repeatEndDate || undefined,
-            },
-            notificationTime: formState.notificationTime,
-          });
+          addOrUpdateEvent();
         }}
       />
 

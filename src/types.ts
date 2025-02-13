@@ -9,7 +9,7 @@ export interface RepeatInfo {
   pattern?: RepeatPattern;
 }
 
-export interface EventFormType {
+export interface Event {
   id?: string;
   title: string;
   date: string;
@@ -20,10 +20,6 @@ export interface EventFormType {
   category: string;
   repeat: RepeatInfo;
   notificationTime: number; // 분 단위로 저장
-}
-
-export interface Event extends EventFormType {
-  id: string;
 }
 
 export interface Notification {
