@@ -4,8 +4,6 @@ export interface TimeValidationResult {
 }
 
 export function getTimeErrorMessage(start: string, end: string): TimeValidationResult {
-  console.log('getTimeErrorMessage 입력값:', start, end); // 함수로 전달된 원래 값 확인
-
   if (!start || !end) {
     return { startTimeError: null, endTimeError: null };
   }
