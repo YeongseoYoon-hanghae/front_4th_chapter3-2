@@ -92,7 +92,7 @@ describe('일정 CRUD 및 기본 기능', () => {
     expect(await within(eventList).findByText(/알림: 1시간 전/)).toBeInTheDocument();
   });
 
-  it('일정 삭제 후 목록에서 제거되고 "검색 결과가 없습니다" 메시지가 표시된다.', async () => {
+  it('일정 삭정 후 목록에서 제거되고 "검색 결과가 없습니다" 메시지가 표시된다.', async () => {
     const initialEvent = { ...sampleEvent };
     setupMockHandlerDeletion([initialEvent]);
     const { user } = renderWithSetup(<App />);
@@ -597,5 +597,76 @@ describe('반복 일정 수정', () => {
     await user.click(screen.getByTestId('event-submit-button'));
 
     expect(within(eventList).queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
+  });
+});
+
+describe('일정 삭제', () => {
+  const singleEvent = {
+    id: '1',
+    title: '일반 회의',
+    date: '2024-10-17',
+    startTime: '10:00',
+    endTime: '11:00',
+    description: '일반 회의입니다',
+    location: '회의실 A',
+    category: '업무',
+    repeat: {
+      type: 'none' as const,
+      interval: 1,
+      endDate: undefined,
+    },
+    notificationTime: 10,
+  };
+
+  const repeatEvent = {
+    id: '2',
+    title: '주간 회의',
+    date: '2024-10-17',
+    startTime: '14:00',
+    endTime: '15:00',
+    description: '매주 진행되는 회의',
+    location: '회의실 B',
+    category: '업무',
+    repeat: {
+      type: 'weekly' as const,
+      interval: 1,
+      endDate: '2024-11-17',
+    },
+    notificationTime: 10,
+  };
+
+  it('일반 일정을 삭제하면 목록에서 제거된다', async () => {
+    setupMockHandlerDeletion([singleEvent]);
+    const { user } = renderWithSetup(<App />);
+
+    const eventList = await screen.findByTestId('event-list');
+    expect(await within(eventList).findByText(singleEvent.title)).toBeInTheDocument();
+
+    const deleteButton = await within(eventList).findByRole('button', { name: 'Delete event' });
+    await user.click(deleteButton);
+
+    await waitFor(() => {
+      expect(within(eventList).queryByText(singleEvent.title)).not.toBeInTheDocument();
+    });
+    expect(await within(eventList).findByText(/검색 결과가 없습니다/)).toBeInTheDocument();
+  });
+
+  it('반복 일정을 삭제하면 모든 반복 일정이 목록에서 제거된다', async () => {
+    setupMockHandlerDeletion([repeatEvent]);
+    const { user } = renderWithSetup(<App />);
+
+    const eventList = await screen.findByTestId('event-list');
+
+    expect(await within(eventList).findByLabelText('repeat-clock-icon')).toBeInTheDocument();
+    expect(await within(eventList).findByText(repeatEvent.title)).toBeInTheDocument();
+
+    const deleteButton = await within(eventList).findByRole('button', { name: 'Delete event' });
+    await user.click(deleteButton);
+
+    await waitFor(() => {
+      expect(within(eventList).queryByText(repeatEvent.title)).not.toBeInTheDocument();
+      expect(within(eventList).queryByLabelText('repeat-clock-icon')).not.toBeInTheDocument();
+    });
+    expect(await within(eventList).findByText(/검색 결과가 없습니다/)).toBeInTheDocument();
   });
 });
