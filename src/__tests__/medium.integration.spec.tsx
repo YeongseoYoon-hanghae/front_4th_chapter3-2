@@ -8,6 +8,7 @@ import {
 } from '../__mocks__/handlersUtils';
 import App from '../App';
 import { renderWithSetup } from './test-utils';
+import { RepeatType } from '../types';
 
 beforeAll(() => {
   vi.setSystemTime(new Date('2024-10-17T09:00:00.000Z'));
