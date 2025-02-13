@@ -45,6 +45,7 @@ const RepeatSetting = ({
         <FormControl>
           <FormLabel>반복 패턴</FormLabel>
           <RadioGroup
+            defaultValue="exact"
             onChange={(value: RepeatPattern) => updateFormState({ repeatPattern: value })}
           >
             <VStack align="start">
@@ -64,6 +65,7 @@ const RepeatSetting = ({
           <FormControl>
             <FormLabel>반복 패턴</FormLabel>
             <RadioGroup
+              defaultValue="exact"
               onChange={(value: RepeatPattern) => updateFormState({ repeatPattern: value })}
             >
               <VStack align="start">
@@ -81,6 +83,7 @@ const RepeatSetting = ({
           <FormControl>
             <FormLabel>반복 패턴</FormLabel>
             <RadioGroup
+              defaultValue="exact"
               onChange={(value: RepeatPattern) => updateFormState({ repeatPattern: value })}
             >
               <VStack align="start">
@@ -99,6 +102,7 @@ const RepeatSetting = ({
         <FormControl>
           <FormLabel>반복 패턴</FormLabel>
           <RadioGroup
+            defaultValue="exact"
             onChange={(value: RepeatPattern) => updateFormState({ repeatPattern: value })}
           >
             <VStack align="start">
@@ -118,6 +122,7 @@ const RepeatSetting = ({
           <FormControl>
             <FormLabel>반복 패턴</FormLabel>
             <RadioGroup
+              defaultValue="exact"
               onChange={(value: RepeatPattern) => updateFormState({ repeatPattern: value })}
             >
               <VStack align="start">
@@ -134,6 +139,7 @@ const RepeatSetting = ({
           <FormControl>
             <FormLabel>반복 패턴</FormLabel>
             <RadioGroup
+              defaultValue="exact"
               onChange={(value: RepeatPattern) => updateFormState({ repeatPattern: value })}
             >
               <VStack align="start">
