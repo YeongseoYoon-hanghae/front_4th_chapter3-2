@@ -18,6 +18,8 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'jsdom',
+      include: ['src/__tests__/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+      exclude: ['src/__tests__/e2e/**/*'],
       setupFiles: './src/setupTests.ts',
       coverage: {
         reportsDirectory: './.coverage',
