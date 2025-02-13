@@ -84,7 +84,7 @@ function App() {
         <EventForm formState={formState} formHandlers={formHandlers} onSubmit={addOrUpdateEvent} />
 
         <Calendar
-          events={events}
+          events={filteredEvents}
           notifiedEvents={notifiedEvents}
           view={view}
           currentDate={currentDate}
