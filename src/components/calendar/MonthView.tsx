@@ -52,7 +52,7 @@ export const MonthView = ({ currentDate, events, notifiedEvents, holidays }: Mon
                           </Text>
                         )}
                         {getEventsForDay(events, day).map((event) => {
-                          const isNotified = notifiedEvents.includes(event.id);
+                          const isNotified = notifiedEvents.includes(event.id || '');
                           const isRepeating = !!event.repeat.type && event.repeat.type !== 'none';
                           return (
                             <EventBox

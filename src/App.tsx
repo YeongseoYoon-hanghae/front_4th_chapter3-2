@@ -50,12 +50,18 @@ function App() {
   });
 
   const checkOverlappingEvents = (eventData: Event): Event[] => {
-    if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
+    if (
+      eventData.repeat?.type !== 'none' &&
+      (eventData.repeat?.endDate || eventData.repeat?.repeatEnd === 'never')
+    ) {
       const repeatEvents = generateRepeatEvents({
         baseEvent: eventData,
         repeatType: eventData.repeat.type,
         interval: eventData.repeat.interval,
-        endDate: eventData.repeat.endDate,
+        endDate:
+          eventData.repeat.repeatEnd === 'never'
+            ? '2025-06-30'
+            : eventData.repeat.endDate || '2025-06-30',
         repeatPattern: formState.repeatPattern,
       });
       return repeatEvents.flatMap((event) => findOverlappingEvents(event, events));
@@ -65,14 +71,21 @@ function App() {
   };
 
   const addNewEvent = async (eventData: Event) => {
-    if (eventData.repeat?.type !== 'none' && eventData.repeat?.endDate) {
+    if (
+      eventData.repeat?.type !== 'none' &&
+      (eventData.repeat?.endDate || eventData.repeat?.repeatEnd === 'never')
+    ) {
       const repeatEvents = generateRepeatEvents({
         baseEvent: { ...eventData, id: undefined },
         repeatType: eventData.repeat.type,
         interval: eventData.repeat.interval,
-        endDate: eventData.repeat.endDate,
+        endDate:
+          eventData.repeat.repeatEnd === 'never'
+            ? '2025-06-30'
+            : eventData.repeat.endDate || '2025-06-30',
         repeatPattern: formState.repeatPattern,
       });
+
       await saveEventList(repeatEvents);
     } else {
       await saveEvent(eventData);
